@@ -2,6 +2,7 @@
 from flask import Flask, url_for
 
 from flask_saml2.sp import ServiceProvider
+from flask_saml2.signing import RsaSha256Signer, Sha256Digester
 from tests.idp.base import CERTIFICATE as IDP_CERTIFICATE
 from tests.sp.base import CERTIFICATE, PRIVATE_KEY
 
@@ -13,6 +14,12 @@ class ExampleServiceProvider(ServiceProvider):
     def get_default_login_return_url(self):
         return url_for('index', _external=True)
 
+    def get_sp_signer(self):
+        private_key = self.get_sp_private_key()
+        return RsaSha256Signer(private_key)
+
+    def get_sp_digester(self):
+        return Sha256Digester()
 
 sp = ExampleServiceProvider()
 

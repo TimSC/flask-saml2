@@ -5,6 +5,7 @@ from flask import Flask, abort, redirect, request, session, url_for
 from flask.views import MethodView
 
 from flask_saml2.idp import IdentityProvider
+from flask_saml2.signing import RsaSha256Signer, Sha256Digester
 from tests.idp.base import CERTIFICATE, PRIVATE_KEY, User
 from tests.sp.base import CERTIFICATE as SP_CERTIFICATE
 
@@ -27,6 +28,12 @@ class ExampleIdentityProvider(IdentityProvider):
     def get_current_user(self):
         return users[session['user']]
 
+    def get_idp_signer(self):
+        private_key = self.get_idp_private_key()
+        return RsaSha256Signer(private_key)
+
+    def get_idp_digester(self):
+        return Sha256Digester()
 
 users = {user.username: user for user in [
     User('alex', 'alex@example.com'),
